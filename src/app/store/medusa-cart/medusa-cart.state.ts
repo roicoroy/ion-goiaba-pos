@@ -7,7 +7,7 @@ import { MedusaCart } from "../../shared/interfaces/medusa-cart.interface";
 import { MedusaLineItem } from "../../shared/interfaces/medusa-line-items.interface";
 import { RegionsState } from "../regions/regions.state";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
-import { environment } from "../../../environments/environment";
+
 import { MedusaOrder, MedusaOrderResponse } from "../../shared/interfaces/medusa-order";
 import { DeleteProdRespoonse } from "../../shared/interfaces/delete-prod-response.interface";
 
@@ -210,7 +210,7 @@ export class MedusaCartState {
     @Action(MedusaCartActions.RemovePromotionsfromCart)
     async removePromotionsfromCart(ctx: StateContext<MedusaCartStateModel>, { promo_code }: MedusaCartActions.RemovePromotionsfromCart) {
         const cartId = ctx.getState().medusaCart?.id;
-        const url = `${environment.MEDUSA_API_BASE_PATH}/store/carts/${cartId}/promotions`;
+        const url = `${process.env.MEDUSA_API_BASE_PATH}/store/carts/${cartId}/promotions`;
         const { cart } = await fetch(
             url,
             {
@@ -218,7 +218,7 @@ export class MedusaCartState {
                 method: "DELETE",
                 headers: {
                     "Content-Type": "application/json",
-                    "x-publishable-api-key": environment.MEDUSA_PUBLISHABLE_KEY,
+                    "x-publishable-api-key": process.env.MEDUSA_PUBLISHABLE_KEY,
                 },
                 body: JSON.stringify({
                     promo_codes: [

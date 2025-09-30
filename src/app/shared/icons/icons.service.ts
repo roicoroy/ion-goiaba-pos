@@ -48,6 +48,9 @@ import {
   paperPlaneSharp,
   closeSharp,
   arrowForward,
+  iceCreamOutline,
+  cafeOutline,
+  fastFoodOutline,
   heartOutline,
   heartSharp,
   contract,
@@ -135,7 +138,8 @@ import {
   addOutline,
   removeOutline,
   createOutline,
-  airplaneOutline} from 'ionicons/icons';
+  airplaneOutline
+} from 'ionicons/icons';
 
 @Injectable({
   providedIn: 'root'
@@ -150,6 +154,11 @@ export class IconsService {
     return addIcons({
       arrowForwardCircle,
       logoGooglePlaystore,
+      closeSharp,
+      arrowForward,
+      iceCreamOutline,
+      cafeOutline,
+      fastFoodOutline,
       logoFacebook,
       logoTwitter,
       logoGoogle,

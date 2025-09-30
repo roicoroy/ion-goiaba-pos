@@ -3,7 +3,11 @@
 // The list of file replacements can be found in `angular.json`.
 
 export const environment = {
-  production: false
+  production: false,
+  MEDUSA_PUBLISHABLE_KEY: "pk_74e52ff3b7866afdc4fb1ee8df4cdbfa0c6a80b8198e5699c8d89e633f1b8a70",
+  MEDUSA_API_BASE_PATH: "http://localhost:9000",
+  MEDUSA_BACKEND_URL: "http://localhost:9000",
+  STRIPE_PUBLISHABLE_KEY: "123",
 };
 
 /*

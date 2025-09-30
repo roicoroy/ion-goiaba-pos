@@ -28,8 +28,9 @@ export class LanguageService {
   async initTranslate() {
     const savedLangage = this.store.selectSnapshot<any>((state: any) => state.language);
     if (!savedLangage.language) {
-      this.translate.use(this.translate.defaultLang);
-      this.store.dispatch(new LanguageActions.SetLanguage(this.translate.defaultLang));
+
+      this.translate.use(this.translate.getFallbackLang()!);
+      this.store.dispatch(new LanguageActions.SetLanguage(this.translate.getFallbackLang()!));
     } else {
       this.translate.use(savedLangage.language);
     }

@@ -6,7 +6,6 @@ import { MedusaCartState } from '../medusa-cart/medusa-cart.state';
 import { CheckoutActions } from './checkout.actions';
 import { MedusaCart } from '../../shared/interfaces/medusa-cart.interface';
 import { MedusaCartActions } from '../medusa-cart/medusa-cart.actions';
-import { environment } from '../../../environments/environment';
 import { IShippingOptions, IPaymentProviders } from '../../shared/interfaces/payment.interface';
 
 export interface CheckoutStateModel {
@@ -125,13 +124,13 @@ export class CheckoutState {
             // Step 1: Create payment collection for the cart
             console.log('Creating payment collection with cart_id:', cart.id);
             const response = await fetch(
-                `${environment.MEDUSA_BACKEND_URL}/store/payment-collections`,
+                `${process.env.MEDUSA_BACKEND_URL}/store/payment-collections`,
                 {
                     credentials: "include",
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
-                        "x-publishable-api-key": environment.MEDUSA_PUBLISHABLE_KEY,
+                        "x-publishable-api-key": process.env.MEDUSA_PUBLISHABLE_KEY,
                     },
                     body: JSON.stringify({
                         cart_id: cart.id,
@@ -158,10 +157,10 @@ export class CheckoutState {
             console.log('Loading payment providers for region:', cart.region_id);
             
             const { payment_providers } = await fetch(
-                `${environment.MEDUSA_BACKEND_URL}/store/payment-providers?region_id=${cart.region_id}`, {
+                `${process.env.MEDUSA_BACKEND_URL}/store/payment-providers?region_id=${cart.region_id}`, {
                 credentials: "include",
                 headers: {
-                    "x-publishable-api-key": environment.MEDUSA_PUBLISHABLE_KEY,
+                    "x-publishable-api-key": process.env.MEDUSA_PUBLISHABLE_KEY,
                 },
             }).then((res) => res.json());
 
@@ -217,13 +216,13 @@ export class CheckoutState {
                 console.log('Creating payment collection with cart_id:', cart.id);
                 
                 const response = await fetch(
-                    `${environment.MEDUSA_BACKEND_URL}/store/payment-collections`,
+                    `${process.env.MEDUSA_BACKEND_URL}/store/payment-collections`,
                     {
                         credentials: "include",
                         method: "POST",
                         headers: {
                             "Content-Type": "application/json",
-                            "x-publishable-api-key": environment.MEDUSA_PUBLISHABLE_KEY,
+                            "x-publishable-api-key": process.env.MEDUSA_PUBLISHABLE_KEY,
                         },
                         body: JSON.stringify({
                             cart_id: cart.id,
@@ -245,13 +244,13 @@ export class CheckoutState {
             // Step 2: Create payment session for the selected provider
             console.log('Creating payment session for collection:', paymentCollectionId);
             const sessionResponse = await fetch(
-                `${environment.MEDUSA_BACKEND_URL}/store/payment-collections/${paymentCollectionId}/payment-sessions`, 
+                `${process.env.MEDUSA_BACKEND_URL}/store/payment-collections/${paymentCollectionId}/payment-sessions`, 
                 {
                     credentials: "include",
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
-                        "x-publishable-api-key": environment.MEDUSA_PUBLISHABLE_KEY,
+                        "x-publishable-api-key": process.env.MEDUSA_PUBLISHABLE_KEY,
                     },
                     body: JSON.stringify({
                         provider_id: payment_provider_id,
@@ -270,11 +269,11 @@ export class CheckoutState {
             
             // Step 3: Re-fetch cart to get updated payment collection
             const cartResponse = await fetch(
-                `${environment.MEDUSA_BACKEND_URL}/store/carts/${cart.id}`,
+                `${process.env.MEDUSA_BACKEND_URL}/store/carts/${cart.id}`,
                 {
                     credentials: "include",
                     headers: {
-                        "x-publishable-api-key": environment.MEDUSA_PUBLISHABLE_KEY,
+                        "x-publishable-api-key": process.env.MEDUSA_PUBLISHABLE_KEY,
                     },
                 }
             );

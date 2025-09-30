@@ -11,15 +11,16 @@ import { IShippingOptionsResponse } from '../../store/checkout/checkout.state';
 import { MedusaCartResponse } from '../../store/medusa-cart/medusa-cart.state';
 import { MedusaProductsCategoriesResponse, MedusaProductsResponse } from '../../store/products/products.state';
 import { MedusaRegionListResponse } from '../../store/regions/regions.state';
+
 import { environment } from '../../../environments/environment';
+
 import { MedusaOrderResponse } from '../interfaces/medusa-order';
 import { DeleteProdRespoonse } from '../interfaces/delete-prod-response.interface';
-import { 
-    MedusaReturn, 
-    CreateReturnRequest, 
-    ReturnResponse, 
+import {
+    CreateReturnRequest,
+    ReturnResponse,
     ReturnsListResponse,
-    ReturnReason 
+    ReturnReason
 } from '../interfaces/medusa-return.interface';
 
 @Injectable({
@@ -351,7 +352,7 @@ export class MedusaService {
         const params = new URLSearchParams();
         if (limit) params.append('limit', limit.toString());
         if (offset) params.append('offset', offset.toString());
-        
+
         const url = `/store/returns${params.toString() ? `?${params.toString()}` : ''}`;
         return this.get<ReturnsListResponse>(url, this.getHttpOptions());
     }
