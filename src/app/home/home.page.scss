@@ -12,7 +12,11 @@ ion-searchbar {
 }
 
 ion-menu {
-  --width: 100px;
+  --width: 200px;
+
+  @media (max-width: 768px) {
+    --width: 250px;
+  }
 }
 
 ion-list {
@@ -20,40 +24,160 @@ ion-list {
 }
 
 ion-item {
-  --padding-start: 0;
-  --inner-padding-end: 0;
+  --padding-start: 16px;
+  --inner-padding-end: 16px;
+
+  &.selected {
+    --background: var(--ion-color-primary-tint);
+    --color: var(--ion-color-primary);
+    font-weight: 600;
+  }
+
+  ion-icon {
+    margin-right: 12px;
+  }
+}
+
+// Loading container
+.loading-container {
+  display: flex;
   flex-direction: column;
-  text-align: center;
+  align-items: center;
+  justify-content: center;
+  height: 200px;
+
+  ion-spinner {
+    margin-bottom: 16px;
+  }
 }
 
-ion-icon {
-  font-size: 2rem;
-  margin-bottom: 0.5rem;
+// Product cards
+.product-card {
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  margin-bottom: 16px;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
+  }
 }
 
-ion-card {
-  border-radius: 10px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+.product-image {
+  height: 200px;
+  object-fit: cover;
+  border-radius: 12px 12px 0 0;
 }
 
-ion-card-title {
+.product-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  margin-bottom: 4px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.3;
+}
+
+.product-price {
+  color: var(--ion-color-primary);
+  font-weight: 600;
   font-size: 1rem;
-  font-weight: bold;
+  margin-bottom: 12px;
 }
 
-ion-card-subtitle {
-  color: #8c8c8c;
+.add-to-cart-btn {
+  --background: var(--ion-color-primary);
+  --color: white;
+  --border-radius: 8px;
+  --padding-start: 12px;
+  --padding-end: 12px;
+  height: 36px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  width: 100%;
+
+  ion-icon {
+    font-size: 1rem;
+    margin-right: 4px;
+  }
 }
 
+// Grid improvements
+ion-grid {
+  padding: 16px;
+
+  ion-row {
+    gap: 0;
+  }
+
+  ion-col {
+    padding: 8px;
+  }
+}
+
+// Empty state
+.ion-text-center {
+  padding: 40px 20px;
+
+  h3 {
+    color: var(--ion-color-medium);
+    margin-bottom: 8px;
+  }
+
+  p {
+    color: var(--ion-color-medium-shade);
+    font-size: 0.9rem;
+  }
+}
+
+// Footer
 ion-footer {
   ion-toolbar {
     --background: #f8f8f8;
-    padding: 0 1rem;
+    padding: 0 16px;
+    border-top: 1px solid var(--ion-color-light-shade);
   }
 
   ion-button {
-    --background: #ffc409;
-    --color: #000;
-    font-weight: bold;
+    --background: var(--ion-color-primary);
+    --color: white;
+    --border-radius: 8px;
+    font-weight: 600;
+
+    ion-icon {
+      margin-right: 4px;
+    }
+  }
+
+  ion-title {
+    font-size: 0.9rem;
+    color: var(--ion-color-medium-shade);
+  }
+}
+
+// Responsive adjustments
+@media (max-width: 768px) {
+  ion-menu {
+    ion-item {
+      --padding-start: 12px;
+      --inner-padding-end: 12px;
+    }
+  }
+
+  .product-image {
+    height: 150px;
+  }
+
+  .product-title {
+    font-size: 0.9rem;
+  }
+
+  .add-to-cart-btn {
+    font-size: 0.8rem;
+    height: 32px;
   }
 }

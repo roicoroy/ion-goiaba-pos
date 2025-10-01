@@ -138,7 +138,10 @@ import {
   addOutline,
   removeOutline,
   createOutline,
-  airplaneOutline
+  airplaneOutline,
+  // New icons for products page
+  pricetagOutline,
+  pricetag
 } from 'ionicons/icons';
 
 @Injectable({
@@ -290,6 +293,8 @@ export class IconsService {
       removeOutline,
       createOutline,
       airplaneOutline,
+      pricetagOutline,
+      pricetag,
       'heart-outline': heartOutline
     });
   }

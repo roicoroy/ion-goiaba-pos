@@ -1,7 +1,7 @@
 <ion-header>
   <ion-toolbar>
-    <ion-title>All Time Favourites</ion-title>
-    <ion-searchbar slot="end"></ion-searchbar>
+    <ion-title>Products</ion-title>
+    <ion-searchbar slot="end" placeholder="Search products..."></ion-searchbar>
   </ion-toolbar>
 </ion-header>
 
@@ -10,33 +10,59 @@
     <ion-menu content-id="main-content">
       <ion-content>
         <ion-list>
-          <ion-item button="true">
-            <ion-icon name="fast-food-outline" slot="start"></ion-icon>
-            <ion-label>All</ion-label>
+          <ion-item button="true" [class.selected]="selectedCategoryId === null" (click)="onCategorySelect(null)">
+            <ion-icon name="grid-outline" slot="start"></ion-icon>
+            <ion-label>All Products</ion-label>
           </ion-item>
-          <ion-item button="true">
-            <ion-icon name="cafe-outline" slot="start"></ion-icon>
-            <ion-label>Drinks</ion-label>
-          </ion-item>
-          <ion-item button="true">
-            <ion-icon name="ice-cream-outline" slot="start"></ion-icon>
-            <ion-label>Desserts</ion-label>
+
+          <ion-item button="true" *ngFor="let category of categories$ | async"
+            [class.selected]="selectedCategoryId === category.id" (click)="onCategorySelect(category.id)">
+            <ion-icon name="pricetag-outline" slot="start"></ion-icon>
+            <ion-label>{{ category.name }}</ion-label>
           </ion-item>
         </ion-list>
       </ion-content>
     </ion-menu>
 
     <div class="ion-page" id="main-content">
-      <ion-grid>
+      <!-- Loading Spinner -->
+      <div *ngIf="isLoading" class="loading-container">
+        <ion-spinner name="circles"></ion-spinner>
+        <ion-text>
+          <p>Loading products...</p>
+        </ion-text>
+      </div>
+
+      <!-- Products Grid -->
+      <ion-grid *ngIf="!isLoading">
         <ion-row>
-          <ion-col size="6" size-md="4" size-lg="3" *ngFor="let i of [1,2,3,4,5,6,7,8,9,10]">
-            <ion-card>
-              <ion-img src="https://via.placeholder.com/300"></ion-img>
+          <ion-col size="6" size-md="4" size-lg="3"
+            *ngFor="let product of getDisplayProducts() | async; trackBy: trackByProductId">
+            <ion-card button="true" class="product-card" (click)="onProductClick(product)">
+              <ion-img [src]="getProductImage(product)" [alt]="product.title" class="product-image"></ion-img>
               <ion-card-header>
-                <ion-card-title>Product Name</ion-card-title>
-                <ion-card-subtitle>RM 0.00</ion-card-subtitle>
+                <ion-card-title class="product-title">
+                  {{ product.title || 'Untitled Product' }}
+                </ion-card-title>
+                <ion-card-subtitle class="product-price">
+                  {{ getProductPrice(product) }}
+                </ion-card-subtitle>
+                <ion-button fill="solid" size="small" class="add-to-cart-btn" (click)="addToCart(product, $event)">
+                  <ion-icon name="cart-outline" slot="start"></ion-icon>
+                  Add to Cart
+                </ion-button>
               </ion-card-header>
             </ion-card>
+          </ion-col>
+        </ion-row>
+
+        <!-- Empty State -->
+        <ion-row *ngIf="(getDisplayProducts() | async)?.length === 0">
+          <ion-col size="12" class="ion-text-center">
+            <ion-text color="medium">
+              <h3>No products found</h3>
+              <p>Try selecting a different category or check back later.</p>
+            </ion-text>
           </ion-col>
         </ion-row>
       </ion-grid>
@@ -46,7 +72,10 @@
 
 <ion-footer>
   <ion-toolbar>
-    <ion-title>2 items in list</ion-title>
-    <ion-button slot="end">View order list</ion-button>
+    <ion-title>{{ (getDisplayProducts() | async)?.length || 0 }} products available</ion-title>
+    <ion-button slot="end" fill="solid">
+      <ion-icon name="cart-outline" slot="start"></ion-icon>
+      View Cart
+    </ion-button>
   </ion-toolbar>
 </ion-footer>

@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { IonApp, IonRouterOutlet } from '@ionic/angular/standalone';
 import { Store } from '@ngxs/store';
 import { MedusaService } from './shared';
@@ -12,7 +12,7 @@ import { MedusaStartService } from './shared/start/medusa-start.service';
   templateUrl: 'app.component.html',
   imports: [IonApp, IonRouterOutlet],
 })
-export class AppComponent {
+export class AppComponent implements OnInit {
 
   private medusaApi = inject(MedusaService);
   private readonly store = inject(Store);
@@ -23,11 +23,9 @@ export class AppComponent {
 
   constructor() { }
 
-
   async ngOnInit(): Promise<void> {
     this.startService.medusaInit();
     await this.initializeApp();
-
   }
 
   async initializeApp() {
