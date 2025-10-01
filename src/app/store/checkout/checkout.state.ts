@@ -4,7 +4,6 @@ import { lastValueFrom, Observable, take, tap } from 'rxjs';
 import { MedusaService } from 'src/app/shared/api/medusa.service';
 import { MedusaCartState } from '../medusa-cart/medusa-cart.state';
 import { CheckoutActions } from './checkout.actions';
-import { MedusaCart } from '../../shared/interfaces/medusa-cart.interface';
 import { MedusaCartActions } from '../medusa-cart/medusa-cart.actions';
 import { IShippingOptions, IPaymentProviders } from '../../shared/interfaces/payment.interface';
 
@@ -80,7 +79,7 @@ export class CheckoutState {
                 console.log('Adding shipping method to cart:', { cartId: cart.id, optionId: option_id });
 
                 // Add shipping method to cart using Medusa API
-                const updatedCart = await lastValueFrom(
+                const updatedCart: any = await lastValueFrom(
                     this.medusaApi.addShippingMethod(cart.id, option_id)
                 );
 
