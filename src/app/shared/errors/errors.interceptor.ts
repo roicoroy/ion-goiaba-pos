@@ -10,11 +10,9 @@ import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 
 import { Store } from '@ngxs/store';
-import { AuthState } from 'src/app/store/auth/auth.state';
+import { AuthState, AuthActions } from 'projects/medusa-store/src/public-api';
 import { GlobalErrorHandlerService } from './global-error-handler/global-error-handler.service';
-import { MedusaCartActions } from 'src/app/store/medusa-cart/medusa-cart.actions';
 import { AlertService } from '../alert/alert.service';
-import { AuthActions } from 'src/app/store/auth/auth.actions';
 import { NavigationService } from '../navigation/navigation.service';
 
 @Injectable({

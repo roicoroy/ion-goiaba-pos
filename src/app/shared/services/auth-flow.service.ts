@@ -2,10 +2,9 @@ import { Injectable, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { ModalController } from '@ionic/angular/standalone';
 import { Store } from '@ngxs/store';
+import { AuthState, AuthActions } from 'medusa-store';
 import { Observable, from } from 'rxjs';
 import { map, switchMap } from 'rxjs/operators';
-import { AuthState } from 'src/app/store/auth/auth.state';
-import { AuthActions } from 'src/app/store/auth/auth.actions';
 import { LoginComponent } from 'src/app/components/auth-component';
 
 @Injectable({
@@ -97,4 +96,4 @@ export class AuthFlowService {
   getAuthState(): Observable<boolean> {
     return this.store.select(AuthState.isLoggedIn);
   }
-} 
+}

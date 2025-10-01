@@ -6,22 +6,17 @@ import { Store } from '@ngxs/store';
 import { ICustomerDetails, ICustomerLoginData } from '../interfaces';
 import { RegisterPayload } from '../interfaces/auth.interface';
 import { MedusaProduct } from '../interfaces/customer-product.interface';
-import { MedusaCategory } from '../interfaces/medusa-categories.interface';
-import { IShippingOptionsResponse } from '../../store/checkout/checkout.state';
-import { MedusaCartResponse } from '../../store/medusa-cart/medusa-cart.state';
-import { MedusaProductsCategoriesResponse, MedusaProductsResponse } from '../../store/products/products.state';
-import { MedusaRegionListResponse } from '../../store/regions/regions.state';
+import { MedusaCategory, MedusaCartResponse, MedusaProductsCategoriesResponse, MedusaProductsResponse, MedusaRegionListResponse, IShippingOptionsResponse } from 'projects/medusa-store/src/public-api';
 
 import { environment } from '../../../environments/environment';
 
-import { MedusaOrderResponse } from '../interfaces/medusa-order';
-import { DeleteProdRespoonse } from '../interfaces/delete-prod-response.interface';
+import { MedusaOrderResponse, DeleteProdRespoonse } from 'projects/medusa-store/src/public-api';
 import {
   CreateReturnRequest,
   ReturnResponse,
   ReturnsListResponse,
   ReturnReason
-} from '../interfaces/medusa-return.interface';
+} from 'projects/medusa-store/src/public-api';
 
 @Injectable({
   providedIn: 'root'

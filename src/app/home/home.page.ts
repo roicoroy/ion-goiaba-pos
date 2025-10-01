@@ -4,11 +4,7 @@ import { NgFor, NgIf, AsyncPipe } from '@angular/common';
 import { Store } from '@ngxs/store';
 import { Observable } from 'rxjs';
 import { MedusaProduct } from '../shared/interfaces/customer-product.interface';
-import { MedusaCategory } from '../shared/interfaces/medusa-categories.interface';
-import { ProductsState } from '../store/products/products.state';
-import { ProductsActions } from '../store/products/products.actions';
-import { RegionsState } from '../store/regions/regions.state';
-import { MedusaCartActions } from '../store/medusa-cart/medusa-cart.actions';
+import { MedusaCategory, ProductsState, ProductsActions, RegionsState, MedusaCartActions } from 'projects/medusa-store/src/public-api';
 import { formatCurrency } from '../shared/utls';
 
 @Component({

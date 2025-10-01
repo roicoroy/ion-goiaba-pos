@@ -2,7 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { CanActivate, Router, ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
 import { Observable, map } from 'rxjs';
 import { Store } from '@ngxs/store';
-import { AuthState } from 'src/app/store/auth/auth.state';
+import { AuthState } from 'projects/medusa-store/src/public-api';
 import { ModalController } from '@ionic/angular/standalone';
 import { LoginComponent } from 'src/app/components/auth-component';
 

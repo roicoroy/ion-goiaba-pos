@@ -6,7 +6,7 @@ import { Observable } from 'rxjs';
 import { environment } from 'src/environments/environment';
 
 import { Store } from '@ngxs/store';
-import { AuthState } from 'src/app/store/auth/auth.state';
+import { AuthState } from 'projects/medusa-store/src/public-api';
 
 @Injectable({
   providedIn: 'root'

@@ -9,6 +9,7 @@ import { importProvidersFrom } from '@angular/core';
 import { NgxStripeModule } from 'ngx-stripe';
 import { SharedModule } from './app/shared';
 import { NgxsStoreModule } from './app/store/store.module';
+import { MedusaStoreModule } from 'projects/medusa-store/src/public-api';
 
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { IMAGE_CONFIG } from '@angular/common';
@@ -49,6 +50,12 @@ bootstrapApplication(AppComponent, {
     ModalController,
     importProvidersFrom(
       NgxsStoreModule,
+      MedusaStoreModule.forRoot({
+        apiBaseUrl: process.env.MEDUSA_BACKEND_URL,
+        publishableKey: process.env.MEDUSA_PUBLISHABLE_KEY,
+        enableLogging: true,
+        enableStorage: true
+      }),
       SharedModule,
       NgxStripeModule.forRoot(process.env.STRIPE_PUBLISHABLE_KEY),
     ),

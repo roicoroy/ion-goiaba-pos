@@ -16,6 +16,7 @@ export * from './lib/services/medusa-api.service';
 
 // Interfaces
 export * from './lib/interfaces';
+export * from './lib/interfaces/shipping.interface';
 
 // Configuration
 // @ts-ignore

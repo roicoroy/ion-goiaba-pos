@@ -3,8 +3,7 @@ import { HttpHandler, HttpInterceptor, HttpRequest, HttpEvent, HttpErrorResponse
 import { Observable, throwError } from 'rxjs';
 import { catchError, switchMap } from 'rxjs/operators';
 import { Store } from '@ngxs/store';
-import { AuthState } from 'src/app/store/auth/auth.state';
-import { AuthActions } from 'src/app/store/auth/auth.actions';
+import { AuthState, AuthActions } from 'projects/medusa-store/src/public-api';
 import { AuthFlowService } from 'src/app/shared/services/auth-flow.service';
 
 @Injectable({
@@ -23,7 +22,7 @@ export class AuthInterceptor implements HttpInterceptor {
         // Check if it's an authentication error (401 Unauthorized)
         if (error.status === 401) {
           const isLoggedIn = this.store.selectSnapshot(AuthState.isLoggedIn);
-          
+
           if (!isLoggedIn) {
             // User is not logged in, show login modal
             this.authFlowService.requireAuth().subscribe();
@@ -32,7 +31,7 @@ export class AuthInterceptor implements HttpInterceptor {
             return this.handleTokenRefresh(request, next);
           }
         }
-        
+
         return throwError(() => error);
       })
     );
@@ -62,4 +61,4 @@ export class AuthInterceptor implements HttpInterceptor {
       })
     );
   }
-} 
+}

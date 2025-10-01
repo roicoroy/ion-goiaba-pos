@@ -1,7 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { Store } from '@ngxs/store';
-import { RegionsActions } from 'src/app/store/regions/regions.actions';
-import { ProductsActions } from 'src/app/store/products/products.actions';
+import { RegionsActions, ProductsActions } from 'medusa-store';
 
 @Injectable({
   providedIn: 'root'

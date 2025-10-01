@@ -1,41 +1,30 @@
 import { NgxsDevtoolsOptions } from '@ngxs/devtools-plugin';
 import { NgxsLoggerPluginOptions } from '@ngxs/logger-plugin';
 import { NgxsConfig } from '@ngxs/store';
-import { ProductsState } from './products/products.state';
-import { RegionsState } from './regions/regions.state';
-import { MedusaCartState } from './medusa-cart/medusa-cart.state';
-import { CheckoutState } from './checkout/checkout.state';
-import { AuthState } from './auth/auth.state';
+import { AuthState, ProductsState, RegionsState } from 'projects/medusa-store/src/public-api';
 import { KeyboardState } from './keyboard/keyboard.state';
 import { LanguageState } from './language/language.state';
 import { FormState } from './forms/form.state';
 import { ThemeState } from './theme/theme.state';
-import { ReturnsState } from './returns/returns.state';
 
 export const STATES_MODULES = [
   ProductsState,
   RegionsState,
-  MedusaCartState,
-  CheckoutState,
+  AuthState,
   LanguageState,
   KeyboardState,
-  AuthState,
   FormState,
-  ThemeState,
-  ReturnsState
+  ThemeState
 ];
 
 export const STORAGE_MODULES = [
   'products',
   'regions',
-  'medusaCart',
-  "checkout",
+  'auth',
   'language',
   'keyboard',
-  'auth',
   'form',
-  'theme',
-  'returns'
+  'theme'
 ];
 
 export const OPTIONS_CONFIG: Partial<NgxsConfig> = {

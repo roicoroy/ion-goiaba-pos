@@ -3,9 +3,8 @@ import { MedusaProduct } from '../interfaces/customer-product.interface';
 import { MedusaWishListService, IMedusaWishListPostData } from '../api/medusa-wishlist.service';
 import { Store } from '@ngxs/store';
 import { Observable, BehaviorSubject, tap, catchError, of, map } from 'rxjs';
-import { AuthState } from '../../store/auth/auth.state';
-import { MedusaCartActions } from '../../store/medusa-cart/medusa-cart.actions';
 import { AlertService } from '../alert/alert.service';
+import { AuthState, MedusaCartActions } from 'medusa-store';
 
 @Injectable({
   providedIn: 'root'
@@ -14,7 +13,7 @@ export class WishlistService {
   private store = inject(Store);
   private medusaWishListService = inject(MedusaWishListService);
   private alertService = inject(AlertService);
-  
+
   private wishlistProductsSubject = new BehaviorSubject<MedusaProduct[]>([]);
   public wishlistProducts$ = this.wishlistProductsSubject.asObservable();
 
@@ -49,7 +48,7 @@ export class WishlistService {
    */
   addToWishlist(product: MedusaProduct, variantId?: string): Observable<boolean> {
     const customer = this.store.selectSnapshot(AuthState.getCustomer);
-    
+
     if (!customer?.id) {
       this.alertService.presentSimpleAlert('Please log in to add items to your wishlist');
       return of(false);
@@ -79,7 +78,7 @@ export class WishlistService {
       tap((updatedCustomer) => {
         // Reload wishlist
         this.loadWishlistFromCustomer();
-        
+
         this.alertService.presentSimpleAlert('Product added to wishlist successfully!');
       }),
       map(() => true),
@@ -96,7 +95,7 @@ export class WishlistService {
    */
   removeFromWishlist(index: number): Observable<boolean> {
     const customer = this.store.selectSnapshot(AuthState.getCustomer);
-    
+
     if (!customer?.id) {
       this.alertService.presentSimpleAlert('Please log in to manage your wishlist');
       return of(false);
@@ -106,7 +105,7 @@ export class WishlistService {
       tap(() => {
         // Reload wishlist
         this.loadWishlistFromCustomer();
-        
+
         this.alertService.presentSimpleAlert('Product removed from wishlist successfully!');
       }),
       map(() => true),
@@ -164,7 +163,7 @@ export class WishlistService {
         updated_at: new Date().toISOString(),
         deleted_at: null
       }));
-      
+
       this.alertService.presentSimpleAlert('Product added to cart successfully!');
     }
   }
@@ -219,4 +218,4 @@ export class WishlistService {
       quantity: item.quantity
     }));
   }
-} 
+}

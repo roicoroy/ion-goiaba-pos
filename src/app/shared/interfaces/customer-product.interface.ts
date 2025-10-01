@@ -1,4 +1,4 @@
-import { MedusaAddress } from "./medusa-address";
+import { MedusaAddress } from 'projects/medusa-store/src/public-api';
 
 export interface MedusaProduct {
   id: string;
