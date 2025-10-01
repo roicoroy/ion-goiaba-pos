@@ -61,6 +61,7 @@ export class RegionsState {
         const state = ctx.getState();
         try {
             const res: MedusaRegionListResponse = await lastValueFrom(this.medusaApi.regionsList());
+            console.log('Fetched regions:', res);
             const newCoutryList: NewCountryListModel[] = res.regions.map((r: any) => {
                 return r.countries?.map((c: { iso_2: String; display_name: String; }) => ({
                     currency_code: r.currency_code,
@@ -72,23 +73,23 @@ export class RegionsState {
 
             // Get user's stored region preference
             const storedRegion = this.getStoredUserRegion();
-            
+
             // Find the user's preferred region in the available regions
             let selectedRegion = null;
             if (storedRegion && newCoutryList.length > 0) {
                 selectedRegion = newCoutryList.find(region => region.country === storedRegion);
             }
-            
+
             // If user's preferred region is not found or not stored, use default
             if (!selectedRegion) {
                 selectedRegion = newCoutryList.find(region => region.country === defaultCoutryCode);
             }
-            
+
             // If still no region found, use the first available region
             if (!selectedRegion && newCoutryList.length > 0) {
                 selectedRegion = newCoutryList[0];
             }
-            
+
             // If no regions available, create a fallback
             if (!selectedRegion) {
                 selectedRegion = {
@@ -98,9 +99,9 @@ export class RegionsState {
                     currency_code: 'usd'
                 };
             }
-            
+
             console.log('Selected region:', selectedRegion, 'Stored preference:', storedRegion);
-            
+
             return ctx.patchState({
                 regionList: newCoutryList,
                 defaultRegion: selectedRegion,
@@ -129,7 +130,7 @@ export class RegionsState {
             if (filted[0]) {
                 // Store user's region preference in localStorage
                 this.storeUserRegion(country);
-                
+
                 this.store.dispatch(new MedusaCartActions.UpdateCartRegion(filted[0].region_id));
                 this.store.dispatch(new ProductsActions.GetProductsId());
                 return ctx.patchState({
@@ -159,7 +160,7 @@ export class RegionsState {
     logout(ctx: StateContext<RegionsStateStateModel>) {
         // Clear stored user region preference on logout
         this.clearStoredUserRegion();
-        
+
         ctx.patchState({
             regionList: undefined,
             defaultRegion: undefined,

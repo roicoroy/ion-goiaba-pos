@@ -13,15 +13,15 @@ export class MedusaStartService {
   async medusaInit() {
     try {
       // Load regions first
-      await this.store.dispatch(new RegionsActions.GetCountries());
-      
-      // Then load products and categories
+      this.store.dispatch(new RegionsActions.GetCountries());
+
+      // // Then load products and categories
       this.store.dispatch(new ProductsActions.GetProductsId());
-      this.store.dispatch(new ProductsActions.GetCategories());
+      // this.store.dispatch(new ProductsActions.GetCategories());
     } catch (error) {
       console.error('Error during Medusa initialization:', error);
       // Fallback to basic products loading if regions fail
-      this.store.dispatch(new ProductsActions.GetProducts());
+      // this.store.dispatch(new ProductsActions.GetProducts());
     }
   }
 }

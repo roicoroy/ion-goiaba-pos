@@ -1,6 +1,6 @@
 import { Injectable, inject } from "@angular/core";
 import { Action, Selector, State, StateContext, Store } from "@ngxs/store";
-import { catchError, lastValueFrom, throwError } from "rxjs";
+import { catchError, lastValueFrom, Observable, take, tap, throwError } from "rxjs";
 import { AuthActions } from "./auth.actions";
 import { MedusaService } from "../../shared/api/medusa.service";
 import { MedusaCustomer } from "../../shared/interfaces/customer-product.interface";
@@ -80,7 +80,7 @@ export class AuthState {
         }
     }
 
-    
+
 
     @Action(AuthActions.Login)
     async login(ctx: StateContext<IAuthStateModel>, { loginPayload }: AuthActions.Login) {
@@ -142,88 +142,85 @@ export class AuthState {
         }
     }
 
-    
+
 
     @Action(AuthActions.AddACustomerAddress)
-    addaShippingAddress(ctx: StateContext<IAuthStateModel>, { address }: AuthActions.AddACustomerAddress) {
+    addaShippingAddress(ctx: StateContext<IAuthStateModel>, { address }: AuthActions.AddACustomerAddress): Observable<any> {
         const state = ctx.getState();
-        return this.medusaApi.addAddress(address)
-            .subscribe((res: any) => {
+        return this.medusaApi.addAddress(address).pipe(
+            take(1),
+            tap((res: any) => {
                 ctx.patchState({
                     ...state,
                     customer: res.customer,
                 });
                 this.store.dispatch(new AuthActions.GetSession());
-            });
+            })
+        );
     }
 
     @Action(AuthActions.UpdateCustomerAddress)
-    updateCustomerAddress(ctx: StateContext<IAuthStateModel>, { addressId, address }: AuthActions.UpdateCustomerAddress) {
+    updateCustomerAddress(ctx: StateContext<IAuthStateModel>, { addressId, address }: AuthActions.UpdateCustomerAddress): Observable<any> {
         const state = ctx.getState();
-        return this.medusaApi.updateAddress(addressId, address)
-            .subscribe((res: any) => {
-                return ctx.patchState({
+        return this.medusaApi.updateAddress(addressId, address).pipe(
+            take(1),
+            tap((res: any) => {
+                ctx.patchState({
                     ...state,
                     customer: res.customer,
                 });
-            });
+            })
+        );
     }
-    // 
+    //
     @Action(AuthActions.DeleteCustomerAddress)
-    deleteCustomerAddress(ctx: StateContext<IAuthStateModel>, { addressId }: AuthActions.DeleteCustomerAddress) {
-        // const state = ctx.getState();
-        return this.medusaApi.deleteAddress(addressId)
-            .subscribe(() => {
+    deleteCustomerAddress(ctx: StateContext<IAuthStateModel>, { addressId }: AuthActions.DeleteCustomerAddress): Observable<any> {
+        return this.medusaApi.deleteAddress(addressId).pipe(
+            take(1),
+            tap(() => {
                 this.store.dispatch(new AuthActions.GetSession());
-            });
+            })
+        );
     }
-    // 
+    //
     @Action(AuthActions.SetDefaultCustomerBillingAddress)
-    setDefaultCustomerBillingAddress(ctx: StateContext<IAuthStateModel>, { addressId, value }: AuthActions.SetDefaultCustomerBillingAddress) {
+    setDefaultCustomerBillingAddress(ctx: StateContext<IAuthStateModel>, { addressId, value }: AuthActions.SetDefaultCustomerBillingAddress): Observable<any> {
         const state = ctx.getState();
         const data = {
             is_default_billing: value,
         }
-        return this.medusaApi.updateDefaultAddress(addressId, data)
-            .subscribe((res: any) => {
+        return this.medusaApi.updateDefaultAddress(addressId, data).pipe(
+            take(1),
+            tap((res: any) => {
                 ctx.patchState({
                     ...state,
                     customer: res.customer,
                 });
-            });
+            })
+        );
     }
     @Action(AuthActions.SetDefaultCustomerShippingAddress)
-    setDefaultCustomerShippingAddress(ctx: StateContext<IAuthStateModel>, { addressId, value }: AuthActions.SetDefaultCustomerShippingAddress) {
+    setDefaultCustomerShippingAddress(ctx: StateContext<IAuthStateModel>, { addressId, value }: AuthActions.SetDefaultCustomerShippingAddress): Observable<any> {
         const state = ctx.getState();
         const data = {
             is_default_shipping: value,
         }
-        return this.medusaApi.updateDefaultAddress(addressId, data)
-            .subscribe((res: any) => {
-                return ctx.patchState({
+        return this.medusaApi.updateDefaultAddress(addressId, data).pipe(
+            take(1),
+            tap((res: any) => {
+                ctx.patchState({
                     ...state,
                     customer: res.customer,
                 });
-            });
+            })
+        );
     }
-    // 
+    //
     @Action(AuthActions.ValidateGoogleCallback)
-    validateGoogleCallback(ctx: StateContext<IAuthStateModel>, { code, state }: AuthActions.ValidateGoogleCallback) {
-        // console.log(code, state);
-        this.medusaApi.validateGoogleLoginCallback(code, state)
-            .pipe(
-                catchError(err => {
-                    const error = throwError(() => new Error(JSON.stringify(err)));
-                    if (error) {
-                        ctx.patchState({
-                            access_token: '',
-                            isLoggedIn: false,
-                        });
-                    }
-                    return error;
-                }),
-            )
-            .subscribe((res: any) => {
+    validateGoogleCallback(ctx: StateContext<IAuthStateModel>, { code, state }: AuthActions.ValidateGoogleCallback): Observable<any> {
+        return this.medusaApi.validateGoogleLoginCallback(code, state).pipe(
+            take(1),
+            tap((res: any) => {
                 console.log(res);
                 if (res.token) {
                     ctx.patchState({
@@ -231,7 +228,6 @@ export class AuthState {
                         isLoggedIn: true,
                     });
                     const shouldCreateCustomer = (jwtDecode(JSON.stringify(res.token)) as { actor_id: string }).actor_id === ""
-                    // console.log(shouldCreateCustomer);
                     if (!shouldCreateCustomer) {
                         ctx.patchState({
                             shouldCreateCustomer: shouldCreateCustomer,
@@ -245,7 +241,15 @@ export class AuthState {
                         });
                     }
                 }
+            }),
+            catchError(err => {
+                ctx.patchState({
+                    access_token: '',
+                    isLoggedIn: false,
+                });
+                return throwError(() => new Error(JSON.stringify(err)));
             })
+        );
     }
     @Action(AuthActions.CreateGoogleUser)
     async CreateGoogleUser(ctx: StateContext<IAuthStateModel>, { registerPayload, medusaAddress }: AuthActions.CreateGoogleUser) {
@@ -263,23 +267,25 @@ export class AuthState {
             });
         }
     }
-    // 
+    //
     @Action(AuthActions.UpdateCustomerDetails)
-    updateCustomerDetails(ctx: StateContext<IAuthStateModel>, { payload }: AuthActions.UpdateCustomerDetails) {
-        try {
-            const state = ctx.getState();
-            this.medusaApi.updateCustomeDetails(payload)
-                .subscribe((res: any) => {
-                    return ctx.patchState({
-                        ...state,
-                        customer: res.customer,
-                    });
-                })
-        }
-        catch (error) {
-        }
+    updateCustomerDetails(ctx: StateContext<IAuthStateModel>, { payload }: AuthActions.UpdateCustomerDetails): Observable<any> {
+        const state = ctx.getState();
+        return this.medusaApi.updateCustomeDetails(payload).pipe(
+            take(1),
+            tap((res: any) => {
+                ctx.patchState({
+                    ...state,
+                    customer: res.customer,
+                });
+            }),
+            catchError(error => {
+                console.error('Error updating customer details:', error);
+                return throwError(() => error);
+            })
+        );
     }
-    // 
+    //
     @Action(AuthActions.AuthLogout)
     authLogout(ctx: StateContext<IAuthStateModel>, { }: AuthActions.AuthLogout) {
         return ctx.patchState({
