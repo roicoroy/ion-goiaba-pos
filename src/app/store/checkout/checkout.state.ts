@@ -321,15 +321,15 @@ export class CheckoutState {
     }
 
     @Action(CheckoutActions.SecretKey)
-    async secretKey(ctx: StateContext<CheckoutStateModel>, { secretKey }: CheckoutActions.SecretKey) {
+    secretKey(ctx: StateContext<CheckoutStateModel>, { secretKey }: CheckoutActions.SecretKey): void {
         ctx.patchState({
             client_secret: secretKey,
         });
     }
 
     @Action(CheckoutActions.UnSetSecretKey)
-    async unSetSecretKey(ctx: StateContext<CheckoutStateModel>): Promise<any> {
-        return ctx.patchState({
+    unSetSecretKey(ctx: StateContext<CheckoutStateModel>): void {
+        ctx.patchState({
             client_secret: '',
         });
     }

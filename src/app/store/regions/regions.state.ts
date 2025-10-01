@@ -6,7 +6,7 @@ import { MedusaRegion } from 'src/app/shared/interfaces/medusa-region.interface'
 import { defaultCoutryCode } from 'src/app/shared/start/data-const';
 import { ProductsActions } from 'src/app/store/products/products.actions';
 import { MedusaCartActions } from 'src/app/store/medusa-cart/medusa-cart.actions';
-import { lastValueFrom } from 'rxjs';
+import { Observable, take, tap, catchError, throwError } from 'rxjs';
 
 // Local storage key for user's region preference
 const USER_REGION_KEY = 'user_selected_region';
@@ -57,69 +57,72 @@ export class RegionsState {
     }
 
     @Action(RegionsActions.GetCountries)
-    async getCountries(ctx: StateContext<RegionsStateStateModel>) {
-        const state = ctx.getState();
-        try {
-            const res: MedusaRegionListResponse = await lastValueFrom(this.medusaApi.regionsList());
-            console.log('Fetched regions:', res);
-            const newCoutryList: NewCountryListModel[] = res.regions.map((r: any) => {
-                return r.countries?.map((c: { iso_2: String; display_name: String; }) => ({
-                    currency_code: r.currency_code,
-                    country: c.iso_2,
-                    region_id: r.id,
-                    label: c.display_name,
-                }))
-            }).flat().sort((a: any, b: any) => (a?.label ?? "").localeCompare(b?.label ?? ""))
+    getCountries(ctx: StateContext<RegionsStateStateModel>): Observable<any> {
+        return this.medusaApi.regionsList().pipe(
+            take(1),
+            tap((res: MedusaRegionListResponse) => {
+                console.log('Fetched regions:', res);
+                const newCoutryList: NewCountryListModel[] = res.regions.map((r: any) => {
+                    return r.countries?.map((c: { iso_2: String; display_name: String; }) => ({
+                        currency_code: r.currency_code,
+                        country: c.iso_2,
+                        region_id: r.id,
+                        label: c.display_name,
+                    }))
+                }).flat().sort((a: any, b: any) => (a?.label ?? "").localeCompare(b?.label ?? ""))
 
-            // Get user's stored region preference
-            const storedRegion = this.getStoredUserRegion();
+                // Get user's stored region preference
+                const storedRegion = this.getStoredUserRegion();
 
-            // Find the user's preferred region in the available regions
-            let selectedRegion = null;
-            if (storedRegion && newCoutryList.length > 0) {
-                selectedRegion = newCoutryList.find(region => region.country === storedRegion);
-            }
+                // Find the user's preferred region in the available regions
+                let selectedRegion = null;
+                if (storedRegion && newCoutryList.length > 0) {
+                    selectedRegion = newCoutryList.find(region => region.country === storedRegion);
+                }
 
-            // If user's preferred region is not found or not stored, use default
-            if (!selectedRegion) {
-                selectedRegion = newCoutryList.find(region => region.country === defaultCoutryCode);
-            }
+                // If user's preferred region is not found or not stored, use default
+                if (!selectedRegion) {
+                    selectedRegion = newCoutryList.find(region => region.country === defaultCoutryCode);
+                }
 
-            // If still no region found, use the first available region
-            if (!selectedRegion && newCoutryList.length > 0) {
-                selectedRegion = newCoutryList[0];
-            }
+                // If still no region found, use the first available region
+                if (!selectedRegion && newCoutryList.length > 0) {
+                    selectedRegion = newCoutryList[0];
+                }
 
-            // If no regions available, create a fallback
-            if (!selectedRegion) {
-                selectedRegion = {
+                // If no regions available, create a fallback
+                if (!selectedRegion) {
+                    selectedRegion = {
+                        country: defaultCoutryCode,
+                        region_id: '',
+                        label: 'Default',
+                        currency_code: 'usd'
+                    };
+                }
+
+                console.log('Selected region:', selectedRegion, 'Stored preference:', storedRegion);
+
+                ctx.patchState({
+                    regionList: newCoutryList,
+                    defaultRegion: selectedRegion,
+                });
+            }),
+            catchError(error => {
+                console.error('Error loading regions:', error);
+                // Set a default region to prevent loading issues
+                const defaultRegion: NewCountryListModel = {
                     country: defaultCoutryCode,
                     region_id: '',
                     label: 'Default',
                     currency_code: 'usd'
                 };
-            }
-
-            console.log('Selected region:', selectedRegion, 'Stored preference:', storedRegion);
-
-            return ctx.patchState({
-                regionList: newCoutryList,
-                defaultRegion: selectedRegion,
-            });
-        } catch (error) {
-            console.error('Error loading regions:', error);
-            // Set a default region to prevent loading issues
-            const defaultRegion: NewCountryListModel = {
-                country: defaultCoutryCode,
-                region_id: '',
-                label: 'Default',
-                currency_code: 'usd'
-            };
-            return ctx.patchState({
-                regionList: [],
-                defaultRegion: defaultRegion,
-            });
-        }
+                ctx.patchState({
+                    regionList: [],
+                    defaultRegion: defaultRegion,
+                });
+                return throwError(() => error);
+            })
+        );
     }
 
     @Action(RegionsActions.SetSelectedCountry)

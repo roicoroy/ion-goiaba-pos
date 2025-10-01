@@ -1,6 +1,6 @@
 import { Injectable, inject } from "@angular/core";
 import { Action, Selector, State, StateContext, Store } from "@ngxs/store";
-import { catchError, lastValueFrom, Observable, take, tap, throwError } from "rxjs";
+import { catchError, Observable, take, tap, throwError } from "rxjs";
 import { AuthActions } from "./auth.actions";
 import { MedusaService } from "../../shared/api/medusa.service";
 import { MedusaCustomer } from "../../shared/interfaces/customer-product.interface";
@@ -63,83 +63,100 @@ export class AuthState {
     }
 
     @Action(AuthActions.Register)
-    async register(ctx: StateContext<IAuthStateModel>, { registerPayload, medusaAddress }: AuthActions.Register) {
-        try {
-            const res: any = await lastValueFrom(this.medusaApi.createMedusaCustomer(registerPayload));
-            if (res.customer) {
-                await this.store.dispatch(new AuthActions.Login(registerPayload));
-                await lastValueFrom(this.store.dispatch(new AuthActions.GetSession()));
-                await lastValueFrom(this.store.dispatch(new AuthActions.AddACustomerAddress(medusaAddress)));
-            }
-        }
-        catch (error) {
-            return ctx.patchState({
-                access_token: '',
-                isLoggedIn: false,
-            });
-        }
+    register(ctx: StateContext<IAuthStateModel>, { registerPayload, medusaAddress }: AuthActions.Register): Observable<any> {
+        return this.medusaApi.createMedusaCustomer(registerPayload).pipe(
+            take(1),
+            tap((res: any) => {
+                if (res.customer) {
+                    this.store.dispatch(new AuthActions.Login(registerPayload));
+                    this.store.dispatch(new AuthActions.GetSession());
+                    this.store.dispatch(new AuthActions.AddACustomerAddress(medusaAddress));
+                }
+            }),
+            catchError(error => {
+                console.error('Error during registration:', error);
+                ctx.patchState({
+                    access_token: '',
+                    isLoggedIn: false,
+                });
+                return throwError(() => error);
+            })
+        );
     }
 
 
 
     @Action(AuthActions.Login)
-    async login(ctx: StateContext<IAuthStateModel>, { loginPayload }: AuthActions.Login) {
-        try {
-            const res: any = await lastValueFrom(this.medusaApi.loginEmailPassword(loginPayload.email, loginPayload.password));
-            if (res.token) {
+    login(ctx: StateContext<IAuthStateModel>, { loginPayload }: AuthActions.Login): Observable<any> {
+        return this.medusaApi.loginEmailPassword(loginPayload.email, loginPayload.password).pipe(
+            take(1),
+            tap((res: any) => {
+                if (res.token) {
+                    ctx.patchState({
+                        access_token: res.token.toString(),
+                        isLoggedIn: true,
+                    });
+                    this.store.dispatch(new AuthActions.GetSession());
+                }
+            }),
+            catchError(error => {
+                console.error('Error during login:', error);
                 ctx.patchState({
-                    access_token: res.token.toString(),
-                    isLoggedIn: true,
+                    access_token: '',
+                    isLoggedIn: false,
                 });
-                this.store.dispatch(new AuthActions.GetSession());
-            }
-        } catch (error) {
-            return ctx.patchState({
-                access_token: '',
-                isLoggedIn: false,
-            });
-        }
+                return throwError(() => error);
+            })
+        );
     }
 
     @Action(AuthActions.GetSession)
-    async getSession(ctx: StateContext<IAuthStateModel>) {
-        try {
-            // console.log('Attempting to get session...');
-            const res: any = await lastValueFrom(this.medusaApi.getMedusaSession());
-            // console.log('Session response:', res);
-            if (res.customer) {
-                // console.log('Customer found in session:', res.customer);
-                return ctx.patchState({
-                    isLoggedIn: true,
-                    customer: res.customer,
-                });
-            } else {
-                // console.log('No customer in session response');
-                // Try alternative method
-                try {
-                    const customerRes: any = await lastValueFrom(this.medusaApi.getMedusaCustomer());
-                    // console.log('Customer response:', customerRes);
-                    if (customerRes.customer) {
-                        return ctx.patchState({
-                            isLoggedIn: true,
-                            customer: customerRes.customer,
-                        });
-                    }
-                } catch (customerError) {
-                    console.error('Error getting customer:', customerError);
-                    return ctx.patchState({
-                        isLoggedIn: false,
-                        customer: null,
+    getSession(ctx: StateContext<IAuthStateModel>): Observable<any> {
+        return this.medusaApi.getMedusaSession().pipe(
+            take(1),
+            tap((res: any) => {
+                if (res.customer) {
+                    ctx.patchState({
+                        isLoggedIn: true,
+                        customer: res.customer,
                     });
+                } else {
+                    // If no customer in session, try alternative method
+                    this.medusaApi.getMedusaCustomer().pipe(
+                        take(1),
+                        tap((customerRes: any) => {
+                            if (customerRes.customer) {
+                                ctx.patchState({
+                                    isLoggedIn: true,
+                                    customer: customerRes.customer,
+                                });
+                            } else {
+                                ctx.patchState({
+                                    isLoggedIn: false,
+                                    customer: null,
+                                });
+                            }
+                        }),
+                        catchError(customerError => {
+                            console.error('Error getting customer:', customerError);
+                            ctx.patchState({
+                                isLoggedIn: false,
+                                customer: null,
+                            });
+                            return throwError(() => customerError);
+                        })
+                    ).subscribe();
                 }
-            }
-        } catch (error) {
-            console.error('Error getting session:', error);
-            return ctx.patchState({
-                isLoggedIn: false,
-                customer: null,
-            });
-        }
+            }),
+            catchError(error => {
+                console.error('Error getting session:', error);
+                ctx.patchState({
+                    isLoggedIn: false,
+                    customer: null,
+                });
+                return throwError(() => error);
+            })
+        );
     }
 
 
@@ -252,20 +269,24 @@ export class AuthState {
         );
     }
     @Action(AuthActions.CreateGoogleUser)
-    async CreateGoogleUser(ctx: StateContext<IAuthStateModel>, { registerPayload, medusaAddress }: AuthActions.CreateGoogleUser) {
-        try {
-            const res: any = await lastValueFrom(this.medusaApi.createMedusaCustomer(registerPayload));
-            if (res.customer) {
-                await lastValueFrom(this.store.dispatch(new AuthActions.AddACustomerAddress(medusaAddress)));
-                await lastValueFrom(this.store.dispatch(new AuthActions.GetSession()));
-            }
-        }
-        catch (error) {
-            return ctx.patchState({
-                access_token: '',
-                isLoggedIn: false,
-            });
-        }
+    CreateGoogleUser(ctx: StateContext<IAuthStateModel>, { registerPayload, medusaAddress }: AuthActions.CreateGoogleUser): Observable<any> {
+        return this.medusaApi.createMedusaCustomer(registerPayload).pipe(
+            take(1),
+            tap((res: any) => {
+                if (res.customer) {
+                    this.store.dispatch(new AuthActions.AddACustomerAddress(medusaAddress));
+                    this.store.dispatch(new AuthActions.GetSession());
+                }
+            }),
+            catchError(error => {
+                console.error('Error creating Google user:', error);
+                ctx.patchState({
+                    access_token: '',
+                    isLoggedIn: false,
+                });
+                return throwError(() => error);
+            })
+        );
     }
     //
     @Action(AuthActions.UpdateCustomerDetails)

@@ -1,6 +1,6 @@
 import { Injectable, inject } from "@angular/core";
 import { State, Store, Selector, Action, StateContext } from "@ngxs/store";
-import { lastValueFrom, Observable, take, tap } from "rxjs";
+import { Observable, take, tap, catchError, throwError } from "rxjs";
 import { MedusaService } from "../../shared/api/medusa.service";
 import { MedusaCartActions } from "./medusa-cart.actions";
 import { MedusaCart } from "../../shared/interfaces/medusa-cart.interface";
@@ -298,27 +298,29 @@ export class MedusaCartState {
   }
   //
   @Action(MedusaCartActions.CompleteCart)
-  async completeCart(ctx: StateContext<MedusaCartStateModel>) {
-    try {
-      const cartId = ctx.getState().medusaCart?.id;
-      // console.log('⭕', cartId);
-      if (cartId != null) {
-        const res = await lastValueFrom(this.medusaApi.completeMedusaCart(cartId));
-        // console.log('⭕', res);
-        return ctx.patchState({
-          medusaCart: undefined,
-          completed_order_id: res.order.id,
-          completedOrder: res.type === 'order' ? res?.order : undefined,
-        });
-      }
-    } catch (error) {
-      console.log(error);
+  completeCart(ctx: StateContext<MedusaCartStateModel>): Observable<any> | void {
+    const cartId = ctx.getState().medusaCart?.id;
+    if (cartId != null) {
+      return this.medusaApi.completeMedusaCart(cartId).pipe(
+        take(1),
+        tap((res: any) => {
+          ctx.patchState({
+            medusaCart: undefined,
+            completed_order_id: res.order.id,
+            completedOrder: res.type === 'order' ? res?.order : undefined,
+          });
+        }),
+        catchError(error => {
+          console.error('Error completing cart:', error);
+          return throwError(() => error);
+        })
+      );
     }
   }
   //
   @Action(MedusaCartActions.UpdateMedusaCartState)
-  async updateMedusaCartState(ctx: StateContext<MedusaCartStateModel>, { cart }: MedusaCartActions.UpdateMedusaCartState) {
-    return ctx.patchState({
+  updateMedusaCartState(ctx: StateContext<MedusaCartStateModel>, { cart }: MedusaCartActions.UpdateMedusaCartState): void {
+    ctx.patchState({
       medusaCart: cart,
     });
   }
