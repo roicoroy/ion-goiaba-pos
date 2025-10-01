@@ -9,6 +9,11 @@
     "strict": true,
     "noImplicitOverride": true,
     "noPropertyAccessFromIndexSignature": true,
+    "paths": {
+      "medusa-store": [
+        "./dist/medusa-store"
+      ]
+    },
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
     "sourceMap": true,
@@ -27,5 +32,13 @@
     "strictInjectionParameters": true,
     "strictInputAccessModifiers": true,
     "strictTemplates": true
-  }
+  },
+  "references": [
+    {
+      "path": "./projects/medusa-store/tsconfig.lib.json"
+    },
+    {
+      "path": "./projects/medusa-store/tsconfig.spec.json"
+    }
+  ]
 }

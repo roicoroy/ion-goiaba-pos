@@ -1,6 +1,6 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { IonHeader, IonToolbar, IonTitle, IonContent, IonSearchbar, IonSplitPane, IonMenu, IonList, IonItem, IonIcon, IonLabel, IonGrid, IonRow, IonCol, IonCard, IonCardHeader, IonCardTitle, IonCardSubtitle, IonImg, IonFooter, IonButton, IonSpinner, IonText } from '@ionic/angular/standalone';
-import { NgFor, NgIf, AsyncPipe, CurrencyPipe } from '@angular/common';
+import { NgFor, NgIf, AsyncPipe } from '@angular/common';
 import { Store } from '@ngxs/store';
 import { Observable } from 'rxjs';
 import { MedusaProduct } from '../shared/interfaces/customer-product.interface';
@@ -20,8 +20,8 @@ import { formatCurrency } from '../shared/utls';
     IonHeader, IonToolbar, IonTitle, IonContent, IonSearchbar, IonSplitPane,
     IonMenu, IonList, IonItem, IonIcon, IonLabel, IonGrid, IonRow, IonCol,
     IonCard, IonCardHeader, IonCardTitle, IonCardSubtitle, IonImg, IonFooter,
-    IonButton, IonSpinner, IonText, NgFor, NgIf, AsyncPipe, CurrencyPipe
-  ],
+    IonButton, IonSpinner, IonText, NgFor, NgIf, AsyncPipe
+],
 })
 export class HomePage implements OnInit {
   private store = inject(Store);
@@ -96,7 +96,7 @@ export class HomePage implements OnInit {
     if (product.images && product.images.length > 0) {
       return product.images[0].url;
     }
-    return 'https://via.placeholder.com/300?text=No+Image';
+    return 'https://placehold.co/600x400';
   }
 
   getDisplayProducts(): Observable<MedusaProduct[]> {
