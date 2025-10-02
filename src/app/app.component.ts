@@ -21,10 +21,11 @@ export class AppComponent implements OnInit {
   private startService = inject(MedusaStartService);
   private language = inject(LanguageService);
 
-  constructor() { }
+  constructor() {
+    this.startService.medusaInit();
+  }
 
   async ngOnInit(): Promise<void> {
-    this.startService.medusaInit();
     await this.initializeApp();
   }
 

@@ -9,7 +9,8 @@ import { importProvidersFrom } from '@angular/core';
 import { NgxStripeModule } from 'ngx-stripe';
 import { SharedModule } from './app/shared';
 import { NgxsStoreModule } from './app/store/store.module';
-import { MedusaStoreModule } from 'projects/medusa-store/src/public-api';
+import { MedusaStoreModule, MedusaApiService } from 'projects/medusa-store/src/public-api';
+import { ConcreteMedusaService } from './app/shared/api/concrete-medusa.service';
 
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { IMAGE_CONFIG } from '@angular/common';
@@ -36,6 +37,7 @@ bootstrapApplication(AppComponent, {
     { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true },
     { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
+    { provide: MedusaApiService, useClass: ConcreteMedusaService },
     provideIonicAngular({
       // mode: "md"
       _forceStatusbarPadding: true,

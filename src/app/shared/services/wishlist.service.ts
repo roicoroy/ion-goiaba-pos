@@ -4,7 +4,7 @@ import { MedusaWishListService, IMedusaWishListPostData } from '../api/medusa-wi
 import { Store } from '@ngxs/store';
 import { Observable, BehaviorSubject, tap, catchError, of, map } from 'rxjs';
 import { AlertService } from '../alert/alert.service';
-import { AuthState, MedusaCartActions } from 'medusa-store';
+import { AuthState, MedusaCartActions } from 'projects/medusa-store/src/public-api';
 
 @Injectable({
   providedIn: 'root'

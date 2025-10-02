@@ -3,23 +3,17 @@ import { Store } from '@ngxs/store';
 import { Observable, combineLatest } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { MedusaCustomer, MedusaProduct } from '../shared/interfaces/customer-product.interface';
-import { MedusaCategory } from '../shared/interfaces/medusa-categories.interface';
-import { ProductsState } from './products/products.state';
-import { MedusaCart } from '../shared/interfaces/medusa-cart.interface';
-import { MedusaCartState } from './medusa-cart/medusa-cart.state';
-import { NewCountryListModel, RegionsState } from './regions/regions.state';
-import { CheckoutState } from './checkout/checkout.state';
-import { AuthState } from './auth/auth.state';
 import { ThemeState } from './theme/theme.state';
+import { MedusaCart, NewCountryListModel, MedusaCategory, AuthState, ProductsState, RegionsState } from 'projects/medusa-store/src/public-api';
 
 export interface IAppFacadeState {
     isDarkMode: boolean,
     isLoggedIn: boolean,
     token: string;
     products: MedusaProduct[];
-    cart: MedusaCart | null;
+    // cart: MedusaCart | null;
     defaultRegions: NewCountryListModel;
-    secret_key: string;
+    // secret_key: string;
     customer: MedusaCustomer | null,
     region_list: NewCountryListModel[];
     productsCategories: MedusaCategory[];
@@ -43,11 +37,11 @@ export class AppFacade {
 
     selectedCategory$: Observable<any[]> = inject(Store).select(ProductsState.getSelectgedCategory);
 
-    cart$: Observable<MedusaCart | null> = inject(Store).select(MedusaCartState.getMedusaCart);
+    // cart$: Observable<MedusaCart | null> = inject(Store).select(MedusaCartState.getMedusaCart);
 
     defaultRegions$: Observable<NewCountryListModel> = inject(Store).select(RegionsState.getDefaultRegion);
 
-    secret_key$: Observable<string> = inject(Store).select(CheckoutState.getSecretKey);
+    // secret_key$: Observable<string> = inject(Store).select(CheckoutState.getSecretKey);
 
     customer$: Observable<MedusaCustomer | null> = inject(Store).select(AuthState.getCustomer);
 
@@ -56,7 +50,7 @@ export class AppFacade {
     selectedProduct$: Observable<MedusaProduct> = inject(Store).select(ProductsState.getSelectedProduct);
 
     readonly viewState$: Observable<IAppFacadeState>;
-    // 
+    //
     constructor() {
         this.viewState$ = combineLatest(
             [
@@ -64,9 +58,9 @@ export class AppFacade {
                 this.isLoggedIn$,
                 this.token$,
                 this.products$,
-                this.cart$,
+                // this.cart$,
                 this.defaultRegions$,
-                this.secret_key$,
+                // this.secret_key$,
                 this.customer$,
                 this.region_list$,
                 this.productsCategories$,
@@ -80,9 +74,9 @@ export class AppFacade {
                     isLoggedIn,
                     token,
                     products,
-                    cart,
+                    // cart,
                     defaultRegions,
-                    secret_key,
+                    // secret_key,
                     customer,
                     region_list,
                     productsCategories,
@@ -94,9 +88,9 @@ export class AppFacade {
                 isLoggedIn,
                 token,
                 products,
-                cart,
+                // cart,
                 defaultRegions,
-                secret_key,
+                // secret_key,
                 customer,
                 region_list,
                 productsCategories,

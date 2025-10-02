@@ -134,7 +134,115 @@ ion-grid {
   }
 }
 
-// Footer
+// Category header
+.category-header {
+  background: var(--ion-color-light);
+  border-bottom: 1px solid var(--ion-color-light-shade);
+
+  ion-item {
+    --background: transparent;
+    --padding-start: 16px;
+    --inner-padding-end: 16px;
+
+    h1 {
+      font-size: 1.2rem;
+      font-weight: 600;
+      margin: 0;
+      color: var(--ion-color-primary);
+    }
+
+    p {
+      margin: 4px 0 0 0;
+      color: var(--ion-color-medium);
+      font-size: 0.85rem;
+    }
+  }
+}
+
+// Product image container with badge
+.product-image-container {
+  position: relative;
+
+  .cart-badge {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    z-index: 10;
+
+    ion-icon {
+      font-size: 0.8rem;
+    }
+  }
+}
+
+// Enhanced empty state
+.empty-state {
+  padding: 60px 20px;
+
+  ion-icon {
+    margin-bottom: 16px;
+    opacity: 0.6;
+  }
+
+  h3 {
+    color: var(--ion-color-medium);
+    margin-bottom: 8px;
+    font-weight: 500;
+  }
+
+  p {
+    color: var(--ion-color-medium-shade);
+    font-size: 0.9rem;
+    margin-bottom: 20px;
+  }
+}
+
+// Enhanced menu styling
+ion-menu {
+  ion-header {
+    ion-toolbar {
+      --background: var(--ion-color-primary);
+      --color: white;
+    }
+  }
+
+  ion-item-divider {
+    --background: var(--ion-color-light);
+    --color: var(--ion-color-medium-shade);
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 12px 16px 8px 16px;
+  }
+
+  ion-item {
+    ion-label {
+      h2 {
+        font-size: 0.95rem;
+        font-weight: 500;
+        margin: 0;
+      }
+
+      p {
+        font-size: 0.8rem;
+        color: var(--ion-color-medium);
+        margin: 2px 0 0 0;
+        display: -webkit-box;
+        -webkit-line-clamp: 1;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+      }
+    }
+
+    ion-badge {
+      font-size: 0.7rem;
+      font-weight: 600;
+    }
+  }
+}
+
+// Footer with cart count
 ion-footer {
   ion-toolbar {
     --background: #f8f8f8;
@@ -147,9 +255,15 @@ ion-footer {
     --color: white;
     --border-radius: 8px;
     font-weight: 600;
+    position: relative;
 
     ion-icon {
       margin-right: 4px;
+    }
+
+    &[disabled] {
+      --background: var(--ion-color-medium);
+      --color: var(--ion-color-medium-contrast);
     }
   }
 
@@ -157,6 +271,21 @@ ion-footer {
     font-size: 0.9rem;
     color: var(--ion-color-medium-shade);
   }
+}
+
+// Cart count badge
+.cart-count-badge {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  min-width: 20px;
+  height: 20px;
+  border-radius: 10px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 // Responsive adjustments
@@ -180,4 +309,9 @@ ion-footer {
     font-size: 0.8rem;
     height: 32px;
   }
+}
+
+
+.products-grid{
+  width: 100%;
 }

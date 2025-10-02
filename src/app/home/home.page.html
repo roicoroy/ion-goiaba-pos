@@ -1,71 +1,156 @@
 <ion-header>
   <ion-toolbar>
-    <ion-title>Products</ion-title>
-    <ion-searchbar slot="end" placeholder="Search products..."></ion-searchbar>
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-title>
+      @if (selectedCategoryId === null) {
+        <span>All Products</span>
+      } @else {
+        <span>{{ getSelectedCategoryName() }}</span>
+      }
+    </ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content>
   <ion-split-pane when="md" content-id="main-content">
     <ion-menu content-id="main-content">
+      <ion-header>
+        <ion-toolbar color="primary">
+          <ion-title>Categories</ion-title>
+        </ion-toolbar>
+      </ion-header>
       <ion-content>
         <ion-list>
-          <ion-item button="true" [class.selected]="selectedCategoryId === null" (click)="onCategorySelect(null)">
-            <ion-icon name="grid-outline" slot="start"></ion-icon>
-            <ion-label>All Products</ion-label>
+          <ion-item button="true"
+                    [class.selected]="selectedCategoryId === null"
+                    (click)="onCategorySelect(null)"
+                    [color]="selectedCategoryId === null ? 'primary' : undefined">
+            <ion-icon name="grid-outline" slot="start" [color]="selectedCategoryId === null ? 'light' : 'medium'"></ion-icon>
+            <ion-label>
+              <h2>All Products</h2>
+              <p>View all available items</p>
+            </ion-label>
+            @if (selectedCategoryId === null) {
+              <ion-badge color="light" slot="end">
+                {{ (products$ | async)?.length || 0 }}
+              </ion-badge>
+            }
           </ion-item>
 
-          <ion-item button="true" *ngFor="let category of categories$ | async"
-            [class.selected]="selectedCategoryId === category.id" (click)="onCategorySelect(category.id)">
-            <ion-icon name="pricetag-outline" slot="start"></ion-icon>
-            <ion-label>{{ category.name }}</ion-label>
-          </ion-item>
+          <ion-item-divider>
+            <ion-label>Shop by Category</ion-label>
+          </ion-item-divider>
+
+          @for (category of categories$ | async; track trackByCategoryId($index, category)) {
+            <ion-item button="true"
+              [class.selected]="selectedCategoryId === category.id" (click)="onCategorySelect(category.id)"
+              [color]="selectedCategoryId === category.id ? 'primary' : undefined">
+              <ion-icon name="pricetag-outline" slot="start"
+                [color]="selectedCategoryId === category.id ? 'light' : 'medium'"></ion-icon>
+              <ion-label>
+                <h2>{{ category.name }}</h2>
+                @if (category.description) {
+                  <p>{{ category.description }}</p>
+                }
+              </ion-label>
+              @if (selectedCategoryId === category.id) {
+                <ion-badge color="light" slot="end">
+                  {{ (selectedCategory$ | async)?.length || 0 }}
+                </ion-badge>
+              }
+            </ion-item>
+          }
         </ion-list>
       </ion-content>
     </ion-menu>
 
     <div class="ion-page" id="main-content">
       <!-- Loading Spinner -->
-      <div *ngIf="isLoading" class="loading-container">
-        <ion-spinner name="circles"></ion-spinner>
-        <ion-text>
-          <p>Loading products...</p>
-        </ion-text>
-      </div>
+      @if (isLoading) {
+        <div class="loading-container">
+          <ion-spinner name="circles"></ion-spinner>
+          <ion-text>
+            <p>Loading products...</p>
+          </ion-text>
+        </div>
+      }
+
+      <!-- Category Header -->
+      @if (!isLoading && selectedCategoryId) {
+        <div class="category-header">
+          <ion-item lines="none">
+            <ion-icon name="pricetag" slot="start" color="primary"></ion-icon>
+            <ion-label>
+              <h1>{{ getSelectedCategoryName() }}</h1>
+              <p>{{ (getDisplayProducts() | async)?.length || 0 }} products available</p>
+            </ion-label>
+            <ion-button fill="clear" slot="end" (click)="onCategorySelect(null)">
+              <ion-icon name="close" slot="icon-only"></ion-icon>
+            </ion-button>
+          </ion-item>
+        </div>
+      }
 
       <!-- Products Grid -->
-      <ion-grid *ngIf="!isLoading">
-        <ion-row>
-          <ion-col size="6" size-md="4" size-lg="3"
-            *ngFor="let product of getDisplayProducts() | async; trackBy: trackByProductId">
-            <ion-card button="true" class="product-card" (click)="onProductClick(product)">
-              <ion-img [src]="getProductImage(product)" [alt]="product.title" class="product-image"></ion-img>
-              <ion-card-header>
-                <ion-card-title class="product-title">
-                  {{ product.title || 'Untitled Product' }}
-                </ion-card-title>
-                <ion-card-subtitle class="product-price">
-                  {{ getProductPrice(product) }}
-                </ion-card-subtitle>
-                <ion-button fill="solid" size="small" class="add-to-cart-btn" (click)="addToCart(product, $event)">
-                  <ion-icon name="cart-outline" slot="start"></ion-icon>
-                  Add to Cart
-                </ion-button>
-              </ion-card-header>
-            </ion-card>
-          </ion-col>
-        </ion-row>
+      @if (!isLoading) {
+        <ion-grid class="products-grid">
+          <ion-row>
+            @for (product of getDisplayProducts() | async; track trackByProductId($index, product)) {
+              <ion-col size="6" size-md="4" size-lg="3" size-xl="2">
+                <ion-card button="true" class="product-card" (click)="onProductClick(product)">
+                  <div class="product-image-container">
+                    <ion-img [src]="getProductImage(product)" [alt]="product.title" class="product-image"></ion-img>
+                    @if (isProductInCart(product)) {
+                      <ion-badge color="success" class="cart-badge">
+                        <ion-icon name="checkmark"></ion-icon>
+                      </ion-badge>
+                    }
+                  </div>
+                  <ion-card-header>
+                    <ion-card-title class="product-title">
+                      {{ product.title || 'Untitled Product' }}
+                    </ion-card-title>
+                    <ion-card-subtitle class="product-price">
+                      @if (getProductPrice(product); as priceData) {
+                        {{ priceData.amount | medusaCurrency:priceData.currency }}
+                      } @else {
+                        Price not available
+                      }
+                    </ion-card-subtitle>
+                    <ion-button fill="solid" size="small" class="add-to-cart-btn" (click)="addToCart(product, $event)"
+                      [disabled]="!hasAvailableVariants(product)">
+                      <ion-icon [name]="isProductInCart(product) ? 'checkmark' : 'cart-outline'" slot="start"></ion-icon>
+                      {{ isProductInCart(product) ? 'Added' : 'Add to Cart' }}
+                    </ion-button>
+                  </ion-card-header>
+                </ion-card>
+              </ion-col>
+            }
+          </ion-row>
 
-        <!-- Empty State -->
-        <ion-row *ngIf="(getDisplayProducts() | async)?.length === 0">
-          <ion-col size="12" class="ion-text-center">
-            <ion-text color="medium">
-              <h3>No products found</h3>
-              <p>Try selecting a different category or check back later.</p>
-            </ion-text>
-          </ion-col>
-        </ion-row>
-      </ion-grid>
+          <!-- Empty State -->
+          @if ((getDisplayProducts() | async)?.length === 0 && !isLoading) {
+            <ion-row>
+              <ion-col size="12" class="ion-text-center empty-state">
+                <ion-icon name="bag-outline" size="large" color="medium"></ion-icon>
+                <h3>No products found</h3>
+                @if (selectedCategoryId) {
+                  <p>No products available in this category.</p>
+                } @else {
+                  <p>No products available at the moment.</p>
+                }
+                @if (selectedCategoryId) {
+                  <ion-button fill="outline" (click)="onCategorySelect(null)">
+                    View All Products
+                  </ion-button>
+                }
+              </ion-col>
+            </ion-row>
+          }
+        </ion-grid>
+      }
     </div>
   </ion-split-pane>
 </ion-content>
@@ -73,9 +158,14 @@
 <ion-footer>
   <ion-toolbar>
     <ion-title>{{ (getDisplayProducts() | async)?.length || 0 }} products available</ion-title>
-    <ion-button slot="end" fill="solid">
-      <ion-icon name="cart-outline" slot="start"></ion-icon>
+    <ion-button slot="end" fill="solid" (click)="viewCart()" [disabled]="getCartItemCount() === 0">
+      <ion-icon name="cart" slot="start"></ion-icon>
       View Cart
+      @if (getCartItemCount() > 0) {
+        <ion-badge color="light" class="cart-count-badge">
+          {{ getCartItemCount() }}
+        </ion-badge>
+      }
     </ion-button>
   </ion-toolbar>
 </ion-footer>
